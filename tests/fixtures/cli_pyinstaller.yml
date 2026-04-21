@@ -1,0 +1,19 @@
+project_name: Demo CLI Utility
+repo_name: demo-cli-utility
+dist_name: demo-cli-utility
+package_name: demo_cli_utility
+project_summary: Demo CLI utility generated from tpl-python-core.
+author_name: HansBug
+author_email: hansbug@buaa.edu.cn
+github_owner: HansBug
+license_name: Apache-2.0
+initial_version: 0.1.0
+python_requires: ">=3.7"
+project_keywords: python, cli, demo
+with_cli: true
+cli_command: demo-cli-utility
+with_pyinstaller: true
+project_identity: Demo CLI Utility is a generated smoke-test project.
+project_scope: Keep the repository small, executable, and packaging-friendly.
+project_constraints: The smoke project must validate bootstrap, unittest, docs, package, and PyInstaller flows.
+

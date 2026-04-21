@@ -1,0 +1,95 @@
+_min_copier_version: "9.0.0"
+_subdirectory: template
+_answers_file: .copier-answers.core.yml
+_templates_suffix: .jinja
+
+project_name:
+  type: str
+  help: Human-readable project title.
+
+repo_name:
+  type: str
+  help: Repository name used on GitHub.
+  default: "{{ project_name | lower | replace(' ', '-') | replace('_', '-') }}"
+
+dist_name:
+  type: str
+  help: Distribution name used by setuptools / PyPI.
+  default: "{{ repo_name }}"
+
+package_name:
+  type: str
+  help: Import package name.
+  default: "{{ repo_name | replace('-', '_') }}"
+
+project_summary:
+  type: str
+  help: One-sentence project summary.
+
+author_name:
+  type: str
+  help: Primary author display name.
+  default: "HansBug"
+
+author_email:
+  type: str
+  help: Primary author email.
+  default: "hansbug@buaa.edu.cn"
+
+github_owner:
+  type: str
+  help: GitHub owner or organization.
+  default: "HansBug"
+
+license_name:
+  type: str
+  help: SPDX-like license selector.
+  default: "Apache-2.0"
+
+initial_version:
+  type: str
+  help: Initial package version.
+  default: "0.1.0"
+
+python_requires:
+  type: str
+  help: setuptools python_requires expression.
+  default: ">=3.7"
+
+project_keywords:
+  type: str
+  help: Comma-separated package keywords.
+  default: "python, utilities"
+
+with_cli:
+  type: bool
+  help: Generate a CLI entrypoint scaffold.
+  default: true
+
+cli_command:
+  type: str
+  help: Console command name.
+  default: "{{ repo_name }}"
+  when: "{{ with_cli }}"
+
+with_pyinstaller:
+  type: bool
+  help: Generate PyInstaller build support.
+  default: false
+  when: "{{ with_cli }}"
+
+project_identity:
+  type: str
+  help: Short AI guide identity paragraph.
+  default: "{{ project_name }} is a Python project maintained in the HansBug-style workflow."
+
+project_scope:
+  type: str
+  help: Short AI guide scope paragraph.
+  default: "Keep the repository pragmatic, cross-platform, and packaging-friendly."
+
+project_constraints:
+  type: str
+  help: Short AI guide constraints paragraph.
+  default: "Preserve quick local bootstrap, standard setuptools packaging, and reproducible docs/test flows."
+

@@ -1,0 +1,9 @@
+include README.md
+include README_zh.md
+include LICENSE
+include requirements.txt
+include requirements-test.txt
+include requirements-doc.txt
+{% if with_pyinstaller %}include requirements-build.txt{% endif %}
+recursive-include {{ package_name }} *.py *.typed
+

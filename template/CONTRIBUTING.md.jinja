@@ -1,0 +1,19 @@
+# Contributing
+
+## Local Workflow
+
+```bash
+make bootstrap
+make unittest
+make docs
+make package
+{% if with_pyinstaller %}make build{% endif %}
+```
+
+## Notes
+
+- Keep `CLAUDE.md` and `AGENTS.md` aligned by editing `CLAUDE.md` and running
+  `make sync_guides`.
+- Keep dependency groups in their corresponding `requirements-*.txt` files.
+- Prefer preserving the existing `Makefile`-driven developer entrypoints.
+

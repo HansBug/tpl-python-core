@@ -1,0 +1,55 @@
+name: Template Smoke
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    name: Smoke ${{ matrix.os }} / ${{ matrix.fixture }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - macos-14
+        fixture:
+          - minimal
+          - cli_pyinstaller
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up system dependencies on Linux
+        if: ${{ runner.os == 'Linux' }}
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y graphviz default-jre make
+
+      - name: Set up system dependencies on macOS
+        if: ${{ runner.os == 'macOS' }}
+        shell: bash
+        run: |
+          brew install graphviz make
+          brew install openjdk
+          echo "$(brew --prefix openjdk)/bin" >> "$GITHUB_PATH"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install template development dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-dev.txt
+          python -m pip install plantumlcli
+
+      - name: Run smoke
+        shell: bash
+        run: |
+          python scripts/smoke_copy.py --fixture tests/fixtures/${{ matrix.fixture }}.yml

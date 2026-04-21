@@ -1,0 +1,75 @@
+# tpl-python-core
+
+[English README](./README.md)
+
+`tpl-python-core` 是一个基于 Copier 的 Python 项目模板仓库，目标是尽量贴近
+`pyfcstm` / `pyudbm` / `hbutils` 这套现有项目的基础设施和使用习惯。
+
+生成出来的仓库默认包含：
+
+- 基于 `setup.py` 的打包元数据
+- `requirements.txt` 以及 `requirements-*.txt` extras 自动发现
+- `AGENTS.md` 和 `CLAUDE.md`
+- Sphinx + Read the Docs 文档骨架
+- 自动 API RST 生成脚本
+- GitHub Actions 的测试、文档、发布工作流
+
+可选能力：
+
+- CLI 脚手架
+- PyInstaller 构建脚手架
+
+## 生成新仓库
+
+从本地模板直接生成：
+
+```bash
+copier copy /path/to/tpl-python-core /path/to/new-project
+```
+
+模板发布到 GitHub 后，也可以直接这样生成：
+
+```bash
+copier copy gh:HansBug/tpl-python-core /path/to/new-project
+```
+
+生成后的仓库默认应支持：
+
+- `make bootstrap`
+- `make unittest`
+- `make docs`
+- `make package`
+- `make build`（启用 PyInstaller 时）
+
+## 生成仓库内置 CI
+
+生成仓库自带：
+
+- `test.yml`：跨平台单元测试
+- `docs.yml`：文档构建校验
+- `release.yml`：PyPI 与 release 产物发布
+
+通常只需要按需配置可选 secrets：
+
+- `CODECOV_TOKEN`：覆盖率上传
+- `PYPI_PASSWORD`：发布到 PyPI
+
+## 模板本地开发
+
+```bash
+python -m pip install -r requirements-dev.txt
+python scripts/smoke_copy.py --fixture tests/fixtures/minimal.yml
+python scripts/smoke_copy.py --fixture tests/fixtures/cli_pyinstaller.yml
+```
+
+模板仓库自身也带有 GitHub Actions smoke matrix，会在 `ubuntu-22.04` 和
+`macos-14` 上分别验证这两个 fixture。
+
+## Git Tag
+
+Copier 的更新能力更适合搭配 Git tag 一起使用：
+
+```bash
+git tag v0.1.0
+git push origin v0.1.0
+```

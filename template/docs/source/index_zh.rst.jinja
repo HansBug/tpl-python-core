@@ -1,0 +1,29 @@
+{{ project_name }}
+{{ "=" * (project_name | length) }}
+
+{{ project_summary }}
+
+.. toctree::
+    :maxdepth: 2
+    :caption: 教程
+    :hidden:
+
+    tutorials/installation/index_zh
+    tutorials/quick_start/index_zh
+
+概览
+----
+
+.. image:: tutorials/structure/architecture.puml.svg
+   :alt: 项目结构图
+
+.. image:: tutorials/structure/flow.gv.svg
+   :alt: 项目流程图
+
+- :doc:`tutorials/installation/index_zh`
+- :doc:`tutorials/quick_start/index_zh`
+
+API 文档
+--------
+
+.. include:: api_doc_zh.rst

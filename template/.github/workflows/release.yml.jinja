@@ -1,0 +1,124 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  publish:
+    name: Publish to PyPI
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 20
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          make bootstrap
+          python -m pip install --upgrade build twine
+
+      - name: Build packages
+        shell: bash
+        run: |
+          make package
+
+      - name: Publish distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: {% raw %}${{ secrets.PYPI_PASSWORD }}{% endraw %}
+          packages-dir: dist/
+          verbose: true
+          skip-existing: true
+
+      - name: Upload distribution to GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+          file: dist/*
+          tag: {% raw %}${{ github.ref }}{% endraw %}
+          overwrite: true
+          file_glob: true
+{% if with_pyinstaller %}
+
+  release_cli:
+    name: CLI Build And Release
+    runs-on: {% raw %}${{ matrix.os }}{% endraw %}
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-22.04
+          - windows-2022
+          - macos-14
+        python-version:
+          - "3.10"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 20
+
+      - name: Set up system dependencies on Linux
+        if: {% raw %}${{ runner.os == 'Linux' }}{% endraw %}
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y make zip
+
+      - name: Set up system dependencies on Windows
+        if: {% raw %}${{ runner.os == 'Windows' }}{% endraw %}
+        shell: bash
+        run: |
+          choco install make zip
+
+      - name: Set up system dependencies on macOS
+        if: {% raw %}${{ runner.os == 'macOS' }}{% endraw %}
+        shell: bash
+        run: |
+          brew install make zip
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: {% raw %}${{ matrix.python-version }}{% endraw %}
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          make bootstrap
+
+      - name: Build standalone CLI
+        shell: bash
+        run: |
+          make build
+          mkdir -p dist/release
+          if [ -f dist/{{ cli_command }} ]; then cp dist/{{ cli_command }} dist/release/; fi
+          if [ -f dist/{{ cli_command }}.exe ]; then cp dist/{{ cli_command }}.exe dist/release/; fi
+          cd dist
+          zip -r {{ repo_name }}-{% raw %}${{ runner.os }}{% endraw %}.zip release
+
+      - name: Upload standalone CLI to GitHub release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+          file: dist/{{ repo_name }}-{% raw %}${{ runner.os }}{% endraw %}.zip
+          asset_name: {{ repo_name }}-{% raw %}${{ runner.os }}{% endraw %}.zip
+          tag: {% raw %}${{ github.ref }}{% endraw %}
+          overwrite: true
+{% endif %}

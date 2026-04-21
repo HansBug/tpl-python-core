@@ -1,0 +1,11 @@
+@startuml
+title {{ project_name }} Architecture
+
+rectangle "Package\n{{ package_name }}" as pkg
+rectangle "Tests\npytest" as tests
+rectangle "Docs\nSphinx" as docs
+
+pkg --> tests
+pkg --> docs
+@enduml
+

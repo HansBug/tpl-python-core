@@ -1,0 +1,135 @@
+.PHONY: bootstrap bootstrap_base bootstrap_test bootstrap_docs bootstrap_build docs test unittest package build clean pdocs rst_auto docs_auto todos_auto tests_auto sync_guides help docsdir
+
+PYTHON := $(shell which python)
+
+PROJ_DIR      := .
+DOC_DIR       := ${PROJ_DIR}/docs
+BUILD_DIR     := ${PROJ_DIR}/build
+DIST_DIR      := ${PROJ_DIR}/dist
+TEST_DIR      := ${PROJ_DIR}/test
+SRC_DIR       := ${PROJ_DIR}/{{ package_name }}
+
+RANGE_DIR      ?= .
+RANGE_TEST_DIR := ${TEST_DIR}/${RANGE_DIR}
+RANGE_SRC_DIR  := ${SRC_DIR}/${RANGE_DIR}
+RANGE_SRC_DIR_TEST := ${TEST_DIR}/${RANGE_DIR}
+
+COV_TYPES ?= xml term-missing
+AUTO_OPTIONS ?= --param max_tokens=400000 --no-ignore-module {{ package_name }} --model-name gpt-5.2-codex
+
+PYTHON_CODE_DIR   := ${SRC_DIR}
+RST_DOC_DIR       := ${DOC_DIR}/source/api_doc
+PYTHON_CODE_FILES := $(shell find ${PYTHON_CODE_DIR} -name "*.py" ! -name "__*.py" 2>/dev/null)
+RST_DOC_FILES     := $(patsubst ${PYTHON_CODE_DIR}/%.py,${RST_DOC_DIR}/%.rst,${PYTHON_CODE_FILES})
+PYTHON_NONM_FILES := $(shell find ${PYTHON_CODE_DIR} -name "__init__.py" 2>/dev/null)
+RST_NONM_FILES    := $(foreach file,${PYTHON_NONM_FILES},$(patsubst %/__init__.py,%/index.rst,$(patsubst ${PYTHON_CODE_DIR}/%,${RST_DOC_DIR}/%,$(patsubst ${PYTHON_CODE_DIR}/__init__.py,${RST_DOC_DIR}/index.rst,${file}))))
+
+help:
+	@echo "{{ project_name }} Build System"
+	@echo "=========================="
+	@echo ""
+	@echo "Bootstrap:"
+	@echo "  make bootstrap      - Install base, test, docs, and optional build dependencies"
+	@echo ""
+	@echo "Testing:"
+	@echo "  make test           - Alias of unittest"
+	@echo "  make unittest       - Run pytest unit tests"
+	@echo "                        Options: RANGE_DIR=<dir> COV_TYPES='xml term-missing'"
+	@echo "                                 MIN_COVERAGE=<percent> WORKERS=<n>"
+	@echo ""
+	@echo "Documentation:"
+	@echo "  make docs           - Build local documentation and print the output path"
+	@echo "  make docs_en        - Build English documentation"
+	@echo "  make docs_zh        - Build Chinese documentation"
+	@echo "  make pdocs          - Build multi-version production documentation"
+	@echo "  make rst_auto       - Generate API RST documents from source"
+	@echo ""
+	@echo "Packaging:"
+	@echo "  make package        - Build Python package (sdist and wheel)"
+	@echo "  make build          - Build standalone executable when PyInstaller is enabled"
+	@echo "  make clean          - Remove build artifacts"
+	@echo ""
+	@echo "Utilities:"
+	@echo "  make sync_guides    - Copy CLAUDE.md to AGENTS.md"
+	@echo ""
+
+bootstrap: bootstrap_base bootstrap_test bootstrap_docs bootstrap_build
+
+bootstrap_base:
+	$(PYTHON) -m pip install --upgrade pip
+	$(PYTHON) -m pip install -r requirements.txt
+	$(PYTHON) -m pip install -e .
+
+bootstrap_test:
+	@if [ -f requirements-test.txt ]; then $(PYTHON) -m pip install -r requirements-test.txt; fi
+
+bootstrap_docs:
+	@if [ -f requirements-doc.txt ]; then $(PYTHON) -m pip install -r requirements-doc.txt; fi
+
+bootstrap_build:
+	@if [ -f requirements-build.txt ]; then $(PYTHON) -m pip install -r requirements-build.txt; fi
+
+package:
+	$(PYTHON) -m build --sdist --wheel --outdir ${DIST_DIR}
+build:
+	{% if with_pyinstaller %}pyinstaller pyinstaller.spec{% else %}@echo "PyInstaller support is disabled for this project."{% endif %}
+
+test: unittest
+
+unittest:
+	pytest "${RANGE_TEST_DIR}" \
+		-sv -m unittest \
+		$(shell for type in ${COV_TYPES}; do echo "--cov-report=$$type"; done) \
+		--cov="${RANGE_SRC_DIR}" \
+		$(if ${MIN_COVERAGE},--cov-fail-under=${MIN_COVERAGE},) \
+		$(if ${WORKERS},-n ${WORKERS},)
+
+docs: rst_auto
+	$(MAKE) -C "${DOC_DIR}" build
+	@$(MAKE) -C "${DOC_DIR}" builddir
+
+docs_en: rst_auto
+	READTHEDOCS_LANGUAGE=en $(MAKE) -C "${DOC_DIR}" build
+	@$(MAKE) -C "${DOC_DIR}" builddir
+
+docs_zh: rst_auto
+	READTHEDOCS_LANGUAGE=zh-cn $(MAKE) -C "${DOC_DIR}" build
+	@$(MAKE) -C "${DOC_DIR}" builddir
+
+docsdir:
+	@$(MAKE) -C "${DOC_DIR}" builddir
+
+pdocs: rst_auto
+	$(MAKE) -C "${DOC_DIR}" prod
+
+docs_auto:
+	python -m hbllmutils code pydoc -i "${RANGE_SRC_DIR}" ${AUTO_OPTIONS}
+
+todos_auto:
+	python -m hbllmutils code todo -i "${RANGE_SRC_DIR}" ${AUTO_OPTIONS}
+
+tests_auto:
+	python -m hbllmutils code unittest -i "${RANGE_SRC_DIR}" -o "${RANGE_SRC_DIR_TEST}" ${AUTO_OPTIONS}
+
+rst_auto: ${RST_DOC_FILES} ${RST_NONM_FILES} auto_rst_top_index.py
+	python auto_rst_top_index.py -i ${PYTHON_CODE_DIR} -o ${DOC_DIR}/source
+
+${RST_DOC_DIR}/%.rst: ${PYTHON_CODE_DIR}/%.py auto_rst.py Makefile
+	@mkdir -p $(dir $@)
+	python auto_rst.py -i $< -o $@
+
+${RST_DOC_DIR}/%/index.rst: ${PYTHON_CODE_DIR}/%/__init__.py auto_rst.py Makefile
+	@mkdir -p $(dir $@)
+	python auto_rst.py -i $< -o $@
+
+${RST_DOC_DIR}/index.rst: ${PYTHON_CODE_DIR}/__init__.py auto_rst.py Makefile
+	@mkdir -p $(dir $@)
+	python auto_rst.py -i $< -o $@
+
+sync_guides:
+	python tools/sync_guides.py
+
+clean:
+	rm -rf ${DIST_DIR} ${BUILD_DIR} *.egg-info
+	rm -rf docs/build .coverage coverage.xml htmlcov
+	rm -rf build dist

@@ -1,0 +1,54 @@
+# AGENTS.md
+
+`AGENTS.md` and `CLAUDE.md` should stay aligned. Prefer editing `CLAUDE.md`
+and then run `make sync_guides`.
+
+## Project Identity
+
+{{ project_identity }}
+
+## Project Scope
+
+{{ project_scope }}
+
+## Project Constraints
+
+{{ project_constraints }}
+
+## Current Repository Reality
+
+- The repository uses a classic `setup.py` packaging flow backed by
+  `pyproject.toml` build-system metadata.
+- Dependency groups are discovered from `requirements-*.txt` files and exposed
+  as setuptools extras.
+- Documentation is built with Sphinx and Read the Docs-oriented structure under
+  `docs/`.
+- API documentation pages are auto-generated from source files via
+  `auto_rst.py` and `auto_rst_top_index.py`.
+{% if with_cli %}
+- The repository exposes a CLI entrypoint through `{{ package_name }}.entry`.
+{% endif %}
+{% if with_pyinstaller %}
+- Standalone executable builds are provided through `PyInstaller`.
+{% endif %}
+
+## Common Commands
+
+```bash
+make bootstrap   # install local development dependencies
+make unittest    # run pytest unit tests
+make docs        # build local documentation
+make package     # build sdist and wheel
+{% if with_pyinstaller %}make build       # build standalone executable with PyInstaller{% endif %}
+make sync_guides # sync CLAUDE.md to AGENTS.md
+```
+
+## Working Rules
+
+- Keep cross-platform behavior in mind for Linux, macOS, and Windows.
+- Prefer keeping developer workflows available through `make` targets.
+- Preserve the generated documentation and test infrastructure unless the user
+  explicitly asks to simplify it.
+- Keep `requirements.txt`, `requirements-test.txt`, `requirements-doc.txt`, and
+  `requirements-build.txt` semantically separated.
+

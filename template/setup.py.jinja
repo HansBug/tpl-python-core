@@ -1,0 +1,106 @@
+import os
+import re
+
+from setuptools import find_packages, setup
+
+_MODULE_NAME = "{{ package_name }}"
+_PACKAGE_NAME = "{{ dist_name }}"
+
+here = os.path.abspath(os.path.dirname(__file__))
+meta = {}
+with open(os.path.join(here, _MODULE_NAME, "config", "meta.py"), "r", encoding="utf-8") as f:
+    exec(f.read(), meta)
+
+
+def _load_req(file: str):
+    with open(file, "r", encoding="utf-8") as f:
+        return [
+            line.strip()
+            for line in f.readlines()
+            if line.strip() and not line.strip().startswith("#")
+        ]
+
+
+requirements = _load_req("requirements.txt")
+
+_REQ_PATTERN = re.compile(r"^requirements-([a-zA-Z0-9_]+)\.txt$")
+group_requirements = {
+    item.group(1): _load_req(item.group(0))
+    for item in [_REQ_PATTERN.fullmatch(reqpath) for reqpath in os.listdir()] if item
+}
+
+with open("README.md", "r", encoding="utf-8") as f:
+    readme = f.read()
+
+setup(
+    name=_PACKAGE_NAME,
+    version=meta["__VERSION__"],
+    packages=find_packages(include=(_MODULE_NAME, f"{_MODULE_NAME}.*")),
+    package_data={
+        package_name: ["py.typed"]
+        for package_name in find_packages(include=("*"))
+    },
+    description=meta["__DESCRIPTION__"],
+    long_description=readme,
+    long_description_content_type="text/markdown",
+    author=meta["__AUTHOR__"],
+    author_email=meta["__AUTHOR_EMAIL__"],
+    license=meta["__LICENSE__"],
+    keywords=meta["__KEYWORDS__"],
+    url=meta["__URL__"],
+    python_requires="{{ python_requires }}",
+    install_requires=requirements,
+    tests_require=group_requirements.get("test", []),
+    extras_require=group_requirements,
+    classifiers=[
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
+        "Intended Audience :: Information Technology",
+{% if license_name == 'MIT' %}
+        "License :: OSI Approved :: MIT License",
+{% elif license_name == 'LGPL-3.0-only' %}
+        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+{% else %}
+        "License :: OSI Approved :: Apache Software License",
+{% endif %}
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
+        "Programming Language :: Python :: 3.14",
+        "Operating System :: OS Independent",
+        "Operating System :: POSIX",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS",
+        "Topic :: Software Development",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Documentation",
+        "Topic :: Utilities",
+        "Typing :: Typed",
+        "Natural Language :: English",
+    ],
+{% if with_cli %}
+    entry_points={
+        "console_scripts": [
+            "{{ cli_command }}={{ package_name }}.entry:main",
+        ],
+    },
+{% endif %}
+    project_urls={
+        "Homepage": meta["__URL__"],
+        "Documentation": meta["__DOC__"],
+        "Repository": meta["__URL__"],
+        "Bug Reports": f'{meta["__URL__"]}/issues',
+        "Source": meta["__URL__"],
+        "Contributing": f'{meta["__URL__"]}/blob/main/CONTRIBUTING.md',
+        "CI": f'{meta["__URL__"]}/actions',
+    },
+)

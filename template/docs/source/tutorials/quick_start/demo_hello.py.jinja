@@ -1,0 +1,12 @@
+from {{ package_name }} import __VERSION__, greet
+
+
+def main():
+    print("{{ project_name }}")
+    print(f"version={__VERSION__}")
+    print(greet("docs"))
+
+
+if __name__ == "__main__":
+    main()
+

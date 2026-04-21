@@ -1,0 +1,16 @@
+PYTHON ?= $(shell which python)
+
+SOURCE ?= .
+DEMO_PY := $(shell find ${SOURCE} -name 'demo_*.py')
+DEMO_TXT := $(addsuffix .demo.txt, $(basename ${DEMO_PY}))
+
+%.demo.txt: %.py
+	PYTHONPATH="$(shell readlink -f ${SOURCE}/../..):$${PYTHONPATH}" $(PYTHON) "$(shell readlink -f $<)" > "$(shell readlink -f $@)"
+
+build: ${DEMO_TXT}
+
+all: build
+
+clean:
+	rm -rf $(shell find ${SOURCE} -name '*.demo.txt')
+

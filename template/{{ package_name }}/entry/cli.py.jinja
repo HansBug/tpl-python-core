@@ -1,0 +1,17 @@
+{% if with_cli -%}
+import click
+
+from ..config.meta import __TITLE__, __VERSION__
+from ..core import greet
+
+
+@click.command(context_settings={"help_option_names": ["-h", "--help"]})
+@click.option("--name", default="world", show_default=True, help="Name to greet.")
+@click.version_option(__VERSION__, prog_name=__TITLE__)
+def main(name: str):
+    """{{ project_summary }}"""
+    click.echo(greet(name))
+{% else -%}
+def main():
+    raise SystemExit("CLI support is disabled for this project.")
+{% endif -%}

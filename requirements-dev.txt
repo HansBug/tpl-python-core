@@ -1,0 +1,5 @@
+build
+copier>=9,<10
+pytest>=8
+PyYAML>=6
+

@@ -1,0 +1,11 @@
+{% if with_cli -%}
+from .cli import main
+
+__all__ = ["main"]
+{% else -%}
+def main():
+    raise SystemExit("CLI support is disabled for this project.")
+
+
+__all__ = ["main"]
+{% endif -%}

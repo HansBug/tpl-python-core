@@ -1,0 +1,9 @@
+{% if with_cli -%}
+from .entry import main
+
+
+if __name__ == "__main__":
+    main()
+{% else -%}
+raise SystemExit("This project does not expose a CLI entrypoint.")
+{% endif -%}

@@ -1,0 +1,71 @@
+# {{ project_name }}
+
+[English README](./README.md)
+
+{{ project_summary }}
+
+## 目录
+
+- [安装](#安装)
+- [快速开始](#快速开始)
+- [开发](#开发)
+- [文档](#文档)
+- [许可证](#许可证)
+
+## 安装
+
+```bash
+pip install {{ dist_name }}
+```
+
+如果需要主分支最新代码：
+
+```bash
+pip install -U git+https://github.com/{{ github_owner }}/{{ repo_name }}@main
+```
+
+## 快速开始
+
+```bash
+make bootstrap
+make unittest
+make docs
+make package
+{% if with_pyinstaller %}make build{% endif %}
+```
+
+{% if with_cli %}
+CLI 帮助：
+
+```bash
+python -m {{ package_name }} --help
+{{ cli_command }} --help
+```
+{% endif %}
+
+## 开发
+
+本地开发建议：
+
+```bash
+git clone https://github.com/{{ github_owner }}/{{ repo_name }}.git
+cd {{ repo_name }}
+make bootstrap
+```
+
+生成出来的仓库保持熟悉的 HansBug 风格依赖拆分：
+
+- `requirements.txt`：运行时依赖
+- `requirements-test.txt`：单元测试依赖
+- `requirements-doc.txt`：文档构建依赖
+{% if with_pyinstaller %}- `requirements-build.txt`：构建依赖，例如 PyInstaller{% endif %}
+
+## 文档
+
+- Read the Docs：`https://{{ repo_name }}.readthedocs.io/en/latest/`
+- 安装页：`https://{{ repo_name }}.readthedocs.io/en/latest/tutorials/installation/index.html`
+- 本地构建：`make docs`
+
+## 许可证
+
+本项目基于 `{{ license_name }}` 许可证发布，详见 `LICENSE`。

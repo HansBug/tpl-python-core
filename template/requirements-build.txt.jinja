@@ -1,0 +1,6 @@
+{% if with_pyinstaller -%}
+pyinstaller>=4.7
+setuptools
+{% else -%}
+# No optional build dependencies for this project.
+{% endif -%}

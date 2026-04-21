@@ -1,0 +1,29 @@
+{{ project_name }}
+{{ "=" * (project_name | length) }}
+
+{{ project_summary }}
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Tutorials
+    :hidden:
+
+    tutorials/installation/index_en
+    tutorials/quick_start/index_en
+
+Overview
+--------
+
+.. image:: tutorials/structure/architecture.puml.svg
+   :alt: Project architecture diagram
+
+.. image:: tutorials/structure/flow.gv.svg
+   :alt: Project flow graph
+
+- :doc:`tutorials/installation/index_en`
+- :doc:`tutorials/quick_start/index_en`
+
+API Reference
+-------------
+
+.. include:: api_doc_en.rst

@@ -1,0 +1,8 @@
+digraph G {
+  rankdir=LR;
+  node [shape=box, style=rounded];
+  bootstrap -> unittest -> docs -> package;
+{% if with_pyinstaller %}
+  package -> build;
+{% endif %}
+}

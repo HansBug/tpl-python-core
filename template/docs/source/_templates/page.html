@@ -1,0 +1,9 @@
+{% extends "!page.html" %}
+
+{% block footer %}
+  {{ super() }}
+  <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+    {% include "versions.html" %}
+  </div>
+{% endblock %}
+

@@ -1,0 +1,71 @@
+# {{ project_name }}
+
+[中文说明 / Chinese README](./README_zh.md)
+
+{{ project_summary }}
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Development](#development)
+- [Documentation](#documentation)
+- [License](#license)
+
+## Installation
+
+```bash
+pip install {{ dist_name }}
+```
+
+If you want the latest main branch:
+
+```bash
+pip install -U git+https://github.com/{{ github_owner }}/{{ repo_name }}@main
+```
+
+## Quick Start
+
+```bash
+make bootstrap
+make unittest
+make docs
+make package
+{% if with_pyinstaller %}make build{% endif %}
+```
+
+{% if with_cli %}
+CLI help:
+
+```bash
+python -m {{ package_name }} --help
+{{ cli_command }} --help
+```
+{% endif %}
+
+## Development
+
+For local development:
+
+```bash
+git clone https://github.com/{{ github_owner }}/{{ repo_name }}.git
+cd {{ repo_name }}
+make bootstrap
+```
+
+The generated repository keeps the familiar HansBug-style dependency split:
+
+- `requirements.txt` for runtime dependencies
+- `requirements-test.txt` for unit test dependencies
+- `requirements-doc.txt` for documentation dependencies
+{% if with_pyinstaller %}- `requirements-build.txt` for build dependencies such as PyInstaller{% endif %}
+
+## Documentation
+
+- Read the Docs: `https://{{ repo_name }}.readthedocs.io/en/latest/`
+- Installation guide: `https://{{ repo_name }}.readthedocs.io/en/latest/tutorials/installation/index.html`
+- Local build: `make docs`
+
+## License
+
+This project is released under the `{{ license_name }}` license. See `LICENSE` for details.
