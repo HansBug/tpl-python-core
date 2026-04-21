@@ -1,4 +1,4 @@
-.PHONY: bootstrap bootstrap_base bootstrap_test bootstrap_docs bootstrap_build docs test unittest package build clean pdocs rst_auto docs_auto todos_auto tests_auto sync_guides help docsdir
+.PHONY: bootstrap bootstrap_base bootstrap_test bootstrap_docs bootstrap_build docs docs_en docs_zh test unittest package build clean pdocs rst_auto help docsdir
 
 PYTHON := $(shell which python)
 
@@ -12,10 +12,8 @@ SRC_DIR       := ${PROJ_DIR}/{{ package_name }}
 RANGE_DIR      ?= .
 RANGE_TEST_DIR := ${TEST_DIR}/${RANGE_DIR}
 RANGE_SRC_DIR  := ${SRC_DIR}/${RANGE_DIR}
-RANGE_SRC_DIR_TEST := ${TEST_DIR}/${RANGE_DIR}
 
 COV_TYPES ?= xml term-missing
-AUTO_OPTIONS ?= --param max_tokens=400000 --no-ignore-module {{ package_name }} --model-name gpt-5.2-codex
 
 PYTHON_CODE_DIR   := ${SRC_DIR}
 RST_DOC_DIR       := ${DOC_DIR}/source/api_doc
@@ -49,9 +47,6 @@ help:
 	@echo "  make build          - Build standalone executable when PyInstaller is enabled"
 	@echo "  make clean          - Remove build artifacts"
 	@echo ""
-	@echo "Utilities:"
-	@echo "  make sync_guides    - Copy CLAUDE.md to AGENTS.md"
-	@echo ""
 
 bootstrap: bootstrap_base bootstrap_test bootstrap_docs bootstrap_build
 
@@ -71,8 +66,14 @@ bootstrap_build:
 
 package:
 	$(PYTHON) -m build --sdist --wheel --outdir ${DIST_DIR}
+
 build:
-	{% if with_pyinstaller %}pyinstaller pyinstaller.spec{% else %}@echo "PyInstaller support is disabled for this project."{% endif %}
+{% if with_pyinstaller %}
+	$(PYTHON) tools/generate_spec.py -o pyinstaller.spec
+	pyinstaller pyinstaller.spec
+{% else %}
+	@echo "PyInstaller support is disabled for this project."
+{% endif %}
 
 test: unittest
 
@@ -102,15 +103,6 @@ docsdir:
 pdocs: rst_auto
 	$(MAKE) -C "${DOC_DIR}" prod
 
-docs_auto:
-	python -m hbllmutils code pydoc -i "${RANGE_SRC_DIR}" ${AUTO_OPTIONS}
-
-todos_auto:
-	python -m hbllmutils code todo -i "${RANGE_SRC_DIR}" ${AUTO_OPTIONS}
-
-tests_auto:
-	python -m hbllmutils code unittest -i "${RANGE_SRC_DIR}" -o "${RANGE_SRC_DIR_TEST}" ${AUTO_OPTIONS}
-
 rst_auto: ${RST_DOC_FILES} ${RST_NONM_FILES} auto_rst_top_index.py
 	python auto_rst_top_index.py -i ${PYTHON_CODE_DIR} -o ${DOC_DIR}/source
 
@@ -126,10 +118,7 @@ ${RST_DOC_DIR}/index.rst: ${PYTHON_CODE_DIR}/__init__.py auto_rst.py Makefile
 	@mkdir -p $(dir $@)
 	python auto_rst.py -i $< -o $@
 
-sync_guides:
-	python tools/sync_guides.py
-
 clean:
-	rm -rf ${DIST_DIR} ${BUILD_DIR} *.egg-info
+	rm -rf ${DIST_DIR} ${BUILD_DIR} *.egg-info pyinstaller.spec
 	rm -rf docs/build .coverage coverage.xml htmlcov
 	rm -rf build dist

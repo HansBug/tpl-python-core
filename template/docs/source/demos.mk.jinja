@@ -1,11 +1,13 @@
-PYTHON ?= $(shell which python)
+PYTHON ?= python
 
 SOURCE ?= .
 DEMO_PY := $(shell find ${SOURCE} -name 'demo_*.py')
 DEMO_TXT := $(addsuffix .demo.txt, $(basename ${DEMO_PY}))
 
+abspath_py = $(shell $(PYTHON) -c 'import os, sys; print(os.path.abspath(sys.argv[1]))' "$(1)")
+
 %.demo.txt: %.py
-	PYTHONPATH="$(shell readlink -f ${SOURCE}/../..):$${PYTHONPATH}" $(PYTHON) "$(shell readlink -f $<)" > "$(shell readlink -f $@)"
+	PYTHONPATH="$(call abspath_py,${SOURCE}/../..):$${PYTHONPATH}" $(PYTHON) "$(call abspath_py,$<)" > "$(call abspath_py,$@)"
 
 build: ${DEMO_TXT}
 
@@ -13,4 +15,3 @@ all: build
 
 clean:
 	rm -rf $(shell find ${SOURCE} -name '*.demo.txt')
-

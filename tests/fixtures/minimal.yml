@@ -8,10 +8,10 @@ author_email: hansbug@buaa.edu.cn
 github_owner: HansBug
 license_name: Apache-2.0
 initial_version: 0.1.0
-python_requires: ">=3.7"
+python_min: "3.8"
+python_max: "3.14"
 project_keywords: python, utilities, demo
-with_cli: false
+with_pyinstaller: false
 project_identity: Demo Utility is a generated smoke-test project.
 project_scope: Keep the repository small, testable, and documentation-friendly.
 project_constraints: The smoke project must validate bootstrap, unittest, docs, and package flows.
-

@@ -1,7 +1,7 @@
 # AGENTS.md
 
-`AGENTS.md` and `CLAUDE.md` should stay aligned. Prefer editing `CLAUDE.md`
-and then run `make sync_guides`.
+`CLAUDE.md` is a symlink to `AGENTS.md`. Edit `AGENTS.md` directly and keep the
+symlink intact.
 
 ## Project Identity
 
@@ -25,11 +25,9 @@ and then run `make sync_guides`.
   `docs/`.
 - API documentation pages are auto-generated from source files via
   `auto_rst.py` and `auto_rst_top_index.py`.
-{% if with_cli %}
-- The repository exposes a CLI entrypoint through `{{ package_name }}.entry`.
-{% endif %}
 {% if with_pyinstaller %}
 - Standalone executable builds are provided through `PyInstaller`.
+- The repository exposes a CLI entrypoint through `{{ package_name }}.entry`.
 {% endif %}
 
 ## Common Commands
@@ -40,7 +38,6 @@ make unittest    # run pytest unit tests
 make docs        # build local documentation
 make package     # build sdist and wheel
 {% if with_pyinstaller %}make build       # build standalone executable with PyInstaller{% endif %}
-make sync_guides # sync CLAUDE.md to AGENTS.md
 ```
 
 ## Working Rules
@@ -51,4 +48,7 @@ make sync_guides # sync CLAUDE.md to AGENTS.md
   explicitly asks to simplify it.
 - Keep `requirements.txt`, `requirements-test.txt`, `requirements-doc.txt`, and
   `requirements-build.txt` semantically separated.
-
+- Keep test paths mirrored with source paths: `{{ package_name }}/foo/bar.py`
+  should map to `test/foo/test_bar.py`.
+- Only introduce `{{ package_name }}/entry` and `test/entry` when standalone
+  CLI build support is enabled.

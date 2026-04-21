@@ -1,10 +1,13 @@
-PIP := $(shell which pip)
+PIP ?= pip
+PYTHON ?= python
+
+abspath_py = $(shell $(PYTHON) -c 'import os, sys; print(os.path.abspath(sys.argv[1]))' "$(1)")
 
 SPHINXOPTS         ?=
 SPHINXBUILD        ?= $(shell which sphinx-build)
 SPHINXMULTIVERSION ?= $(shell which sphinx-multiversion)
-SOURCEDIR          ?= $(shell readlink -f ${CURDIR})
-BUILDDIR           ?= $(shell readlink -f ${CURDIR}/../build)
+SOURCEDIR          ?= $(call abspath_py,${CURDIR})
+BUILDDIR           ?= $(call abspath_py,${CURDIR}/../build)
 
 DIAGRAMS_MK := ${SOURCEDIR}/diagrams.mk
 DIAGRAMS    := $(MAKE) -f "${DIAGRAMS_MK}" SOURCE=${SOURCEDIR}
@@ -14,9 +17,9 @@ DEMOS_MK    := ${SOURCEDIR}/demos.mk
 DEMOS       := $(MAKE) -f "${DEMOS_MK}" SOURCE=${SOURCEDIR}
 
 _CURRENT_PATH := ${PATH}
-_PROJ_DIR     := $(shell readlink -f ${SOURCEDIR}/../..)
-_LIBS_DIR     := $(shell readlink -f ${SOURCEDIR}/_libs)
-_SHIMS_DIR    := $(shell readlink -f ${SOURCEDIR}/_shims)
+_PROJ_DIR     := $(call abspath_py,${SOURCEDIR}/../..)
+_LIBS_DIR     := $(call abspath_py,${SOURCEDIR}/_libs)
+_SHIMS_DIR    := $(call abspath_py,${SOURCEDIR}/_shims)
 
 .EXPORT_ALL_VARIABLES:
 
@@ -36,4 +39,3 @@ clean:
 	@$(DIAGRAMS) clean
 	@$(GRAPHVIZ) clean
 	@$(DEMOS) clean
-

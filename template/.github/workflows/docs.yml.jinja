@@ -21,7 +21,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: "{{ python_max }}"
 
       - name: Install dependencies
         shell: bash
@@ -39,4 +39,3 @@ jobs:
         with:
           name: docs-html
           path: docs/build/html
-

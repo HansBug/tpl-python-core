@@ -1,4 +1,7 @@
-DOT := $(shell which dot)
+DOT ?= dot
+PYTHON ?= python
+
+abspath_py = $(shell $(PYTHON) -c 'import os, sys; print(os.path.abspath(sys.argv[1]))' "$(1)")
 
 SOURCE ?= .
 GVS    := $(shell find ${SOURCE} -name '*.gv')
@@ -6,10 +9,10 @@ PNGS   := $(addsuffix .gv.png, $(basename ${GVS}))
 SVGS   := $(addsuffix .gv.svg, $(basename ${GVS}))
 
 %.gv.png: %.gv
-	$(DOT) -Tpng -o"$(shell readlink -f $@)" "$(shell readlink -f $<)"
+	$(DOT) -Tpng -o"$(call abspath_py,$@)" "$(call abspath_py,$<)"
 
 %.gv.svg: %.gv
-	$(DOT) -Tsvg -o"$(shell readlink -f $@)" "$(shell readlink -f $<)"
+	$(DOT) -Tsvg -o"$(call abspath_py,$@)" "$(call abspath_py,$<)"
 
 build: ${SVGS} ${PNGS}
 
@@ -19,4 +22,3 @@ clean:
 	rm -rf \
 		$(shell find ${SOURCE} -name '*.gv.svg') \
 		$(shell find ${SOURCE} -name '*.gv.png')
-

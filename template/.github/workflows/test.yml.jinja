@@ -1,3 +1,5 @@
+{% set python_min_minor = python_min.split('.')[1] | int %}
+{% set python_max_minor = python_max.split('.')[1] | int %}
 name: Code Test
 
 on:
@@ -17,17 +19,14 @@ jobs:
           - windows-2022
           - macos-14
         python-version:
-          - "3.7"
-          - "3.8"
-          - "3.9"
-          - "3.10"
-          - "3.11"
-          - "3.12"
-          - "3.13"
-          - "3.14"
+{% for python_minor in range(python_min_minor, python_max_minor + 1) %}
+          - "3.{{ python_minor }}"
+{% endfor %}
+{% if python_min_minor <= 7 and python_max_minor >= 7 %}
         exclude:
           - os: macos-14
             python-version: "3.7"
+{% endif %}
 
     steps:
       - name: Checkout code
@@ -105,7 +104,7 @@ jobs:
           - windows-2022
           - macos-14
         python-version:
-          - "3.10"
+          - "{{ python_max }}"
 
     steps:
       - name: Checkout code

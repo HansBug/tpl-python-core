@@ -9,28 +9,27 @@ The generated repositories always include:
 
 - Python package layout with `setup.py`-driven metadata
 - `requirements.txt` plus `requirements-*.txt` extras discovery
-- `AGENTS.md` and `CLAUDE.md`
+- `AGENTS.md` with `CLAUDE.md` as a symlink
 - Sphinx + Read the Docs documentation skeleton
 - auto-generated API RST helpers
 - GitHub Actions workflows for test, docs, and release
 
 Optional features:
 
-- CLI scaffold
-- PyInstaller build scaffold
+- PyInstaller build scaffold, including the CLI entrypoint layout
 
 ## Create A Repository
 
 Render a new project from the local template:
 
 ```bash
-copier copy /path/to/tpl-python-core /path/to/new-project
+copier copy --trust /path/to/tpl-python-core /path/to/new-project
 ```
 
 After the template repo is published, the remote form is:
 
 ```bash
-copier copy gh:HansBug/tpl-python-core /path/to/new-project
+copier copy --trust gh:HansBug/tpl-python-core /path/to/new-project
 ```
 
 The generated repository is expected to support:

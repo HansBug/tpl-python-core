@@ -26,6 +26,35 @@ def _venv_python(venv_dir: Path) -> Path:
     return venv_dir / "bin" / "python"
 
 
+def _assert_rendered_layout(project_dir: Path, answers: dict):
+    claude = project_dir / "CLAUDE.md"
+    agents = project_dir / "AGENTS.md"
+    shims_dir = project_dir / "docs" / "source" / "_shims"
+    assert agents.is_file(), "AGENTS.md should exist."
+    assert claude.is_symlink(), "CLAUDE.md should be a symlink."
+    assert os.readlink(claude) == "AGENTS.md", "CLAUDE.md should point to AGENTS.md."
+    assert (shims_dir / ".keep").is_file()
+
+    assert (project_dir / "test" / "config" / "test_meta.py").is_file()
+    assert (project_dir / "test" / "test_core.py").is_file()
+
+    package_name = answers["package_name"]
+    if answers.get("with_pyinstaller"):
+        assert (project_dir / package_name / "__main__.py").is_file()
+        assert (project_dir / package_name / "entry").is_dir()
+        assert (project_dir / "test" / "entry" / "test_cli.py").is_file()
+        assert (project_dir / "requirements-build.txt").is_file()
+        assert (project_dir / "tools" / "generate_spec.py").is_file()
+        assert (shims_dir / answers["cli_command"]).is_file()
+    else:
+        assert not (project_dir / package_name / "__main__.py").exists()
+        assert not (project_dir / package_name / "entry").exists()
+        assert not (project_dir / "test" / "entry").exists()
+        assert not (project_dir / "requirements-build.txt").exists()
+        assert not (project_dir / "tools" / "generate_spec.py").exists()
+        assert sorted(path.name for path in shims_dir.iterdir()) == [".keep"]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Render and validate tpl-python-core smoke projects.")
     parser.add_argument("--fixture", required=True, help="Fixture YAML file with Copier answers.")
@@ -52,8 +81,9 @@ def main():
             data=answers,
             defaults=True,
             overwrite=True,
-            unsafe=False,
+            unsafe=True,
         )
+        _assert_rendered_layout(project_dir, answers)
 
         _run([sys.executable, "-m", "venv", str(venv_dir)], cwd=tmp_path)
         py = _venv_python(venv_dir)
@@ -75,7 +105,7 @@ def main():
             if keep_dir.exists():
                 shutil.rmtree(keep_dir)
             keep_dir.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copytree(project_dir, keep_dir)
+            shutil.copytree(project_dir, keep_dir, symlinks=True)
             print(f"Kept smoke output at {keep_dir}")
 
 

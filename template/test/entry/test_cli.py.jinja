@@ -1,11 +1,9 @@
 import pytest
-
-pytestmark = pytest.mark.unittest
-
-{% if with_cli -%}
 from click.testing import CliRunner
 
 from {{ package_name }}.entry import main
+
+pytestmark = pytest.mark.unittest
 
 
 def test_cli_help():
@@ -20,7 +18,3 @@ def test_cli_output():
     result = runner.invoke(main, ["--name", "Alice"])
     assert result.exit_code == 0
     assert "Hello, Alice!" in result.output
-{% else -%}
-def test_cli_disabled_placeholder():
-    assert True
-{% endif -%}

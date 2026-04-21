@@ -9,28 +9,27 @@
 
 - 基于 `setup.py` 的打包元数据
 - `requirements.txt` 以及 `requirements-*.txt` extras 自动发现
-- `AGENTS.md` 和 `CLAUDE.md`
+- `AGENTS.md`，以及指向它的 `CLAUDE.md` 软链接
 - Sphinx + Read the Docs 文档骨架
 - 自动 API RST 生成脚本
 - GitHub Actions 的测试、文档、发布工作流
 
 可选能力：
 
-- CLI 脚手架
-- PyInstaller 构建脚手架
+- PyInstaller 构建脚手架，以及对应的 CLI 入口布局
 
 ## 生成新仓库
 
 从本地模板直接生成：
 
 ```bash
-copier copy /path/to/tpl-python-core /path/to/new-project
+copier copy --trust /path/to/tpl-python-core /path/to/new-project
 ```
 
 模板发布到 GitHub 后，也可以直接这样生成：
 
 ```bash
-copier copy gh:HansBug/tpl-python-core /path/to/new-project
+copier copy --trust gh:HansBug/tpl-python-core /path/to/new-project
 ```
 
 生成后的仓库默认应支持：

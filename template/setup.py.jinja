@@ -1,3 +1,6 @@
+{% set python_major = python_min.split('.')[0] %}
+{% set python_min_minor = python_min.split('.')[1] | int %}
+{% set python_max_minor = python_max.split('.')[1] | int %}
 import os
 import re
 
@@ -48,33 +51,37 @@ setup(
     license=meta["__LICENSE__"],
     keywords=meta["__KEYWORDS__"],
     url=meta["__URL__"],
-    python_requires="{{ python_requires }}",
+    python_requires=">={{ python_min }},<={{ python_max }}",
     install_requires=requirements,
     tests_require=group_requirements.get("test", []),
     extras_require=group_requirements,
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Intended Audience :: Information Technology",
-{% if license_name == 'MIT' %}
+        "Intended Audience :: System Administrators",
+{% if license_name == 'Apache-2.0' %}
+        "License :: OSI Approved :: Apache Software License",
+{% elif license_name == 'MIT' %}
         "License :: OSI Approved :: MIT License",
+{% elif license_name in ['BSD-2-Clause', 'BSD-3-Clause'] %}
+        "License :: OSI Approved :: BSD License",
+{% elif license_name == 'GPL-3.0-only' %}
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 {% elif license_name == 'LGPL-3.0-only' %}
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
+{% elif license_name == 'MPL-2.0' %}
+        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
 {% else %}
-        "License :: OSI Approved :: Apache Software License",
+        "License :: Other/Proprietary License",
 {% endif %}
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
-        "Programming Language :: Python :: 3.11",
-        "Programming Language :: Python :: 3.12",
-        "Programming Language :: Python :: 3.13",
-        "Programming Language :: Python :: 3.14",
+{% for python_minor in range(python_min_minor, python_max_minor + 1) %}
+        "Programming Language :: Python :: {{ python_major }}.{{ python_minor }}",
+{% endfor %}
         "Operating System :: OS Independent",
         "Operating System :: POSIX",
         "Operating System :: Microsoft :: Windows",
@@ -82,12 +89,13 @@ setup(
         "Topic :: Software Development",
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Software Development :: Build Tools",
         "Topic :: Documentation",
         "Topic :: Utilities",
         "Typing :: Typed",
         "Natural Language :: English",
     ],
-{% if with_cli %}
+{% if with_pyinstaller %}
     entry_points={
         "console_scripts": [
             "{{ cli_command }}={{ package_name }}.entry:main",
@@ -101,6 +109,8 @@ setup(
         "Bug Reports": f'{meta["__URL__"]}/issues',
         "Source": meta["__URL__"],
         "Contributing": f'{meta["__URL__"]}/blob/main/CONTRIBUTING.md',
+        "Pull Requests": f'{meta["__URL__"]}/pulls',
         "CI": f'{meta["__URL__"]}/actions',
+        "License": f'{meta["__URL__"]}/blob/main/LICENSE',
     },
 )

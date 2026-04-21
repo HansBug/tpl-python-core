@@ -2,6 +2,16 @@ _min_copier_version: "9.0.0"
 _subdirectory: template
 _answers_file: .copier-answers.core.yml
 _templates_suffix: .jinja
+_tasks:
+  - >-
+    if [ "{{ 1 if not with_pyinstaller else 0 }}" = "1" ]; then
+      rm -rf "{{ package_name }}/entry" "{{ package_name }}/__main__.py" "test/entry" "requirements-build.txt" "tools/generate_spec.py";
+    fi
+  - >-
+    if [ "{{ 1 if not with_pyinstaller else 0 }}" = "1" ]; then
+      find "docs/source/_shims" -mindepth 1 ! -name '.keep' -delete;
+    fi
+  - rm -f "CLAUDE.md" && ln -s "AGENTS.md" "CLAUDE.md"
 
 project_name:
   type: str
@@ -45,38 +55,67 @@ license_name:
   type: str
   help: SPDX-like license selector.
   default: "Apache-2.0"
+  choices:
+    - "Apache-2.0"
+    - "MIT"
+    - "BSD-2-Clause"
+    - "BSD-3-Clause"
+    - "GPL-3.0-only"
+    - "LGPL-3.0-only"
+    - "MPL-2.0"
 
 initial_version:
   type: str
   help: Initial package version.
   default: "0.1.0"
 
-python_requires:
+python_min:
   type: str
-  help: setuptools python_requires expression.
-  default: ">=3.7"
+  help: Minimum supported Python version.
+  default: "3.8"
+  choices:
+    - "3.7"
+    - "3.8"
+    - "3.9"
+    - "3.10"
+    - "3.11"
+    - "3.12"
+    - "3.13"
+    - "3.14"
+
+python_max:
+  type: str
+  help: Maximum supported Python version.
+  default: "3.14"
+  validator: >-
+    {% if python_max.split('.')[0] != python_min.split('.')[0] or (python_max.split('.')[1] | int) < (python_min.split('.')[1] | int) %}
+    python_max must be in the same major version line and not lower than python_min.
+    {% endif %}
+  choices:
+    - "3.7"
+    - "3.8"
+    - "3.9"
+    - "3.10"
+    - "3.11"
+    - "3.12"
+    - "3.13"
+    - "3.14"
 
 project_keywords:
   type: str
   help: Comma-separated package keywords.
   default: "python, utilities"
 
-with_cli:
+with_pyinstaller:
   type: bool
-  help: Generate a CLI entrypoint scaffold.
-  default: true
+  help: Generate PyInstaller build support and CLI entrypoint scaffolding.
+  default: false
 
 cli_command:
   type: str
   help: Console command name.
   default: "{{ repo_name }}"
-  when: "{{ with_cli }}"
-
-with_pyinstaller:
-  type: bool
-  help: Generate PyInstaller build support.
-  default: false
-  when: "{{ with_cli }}"
+  when: "{{ with_pyinstaller }}"
 
 project_identity:
   type: str
@@ -92,4 +131,3 @@ project_constraints:
   type: str
   help: Short AI guide constraints paragraph.
   default: "Preserve quick local bootstrap, standard setuptools packaging, and reproducible docs/test flows."
-

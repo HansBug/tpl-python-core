@@ -1,6 +1,6 @@
 import pytest
 
-from {{ package_name }} import __VERSION__, greet
+from {{ package_name }} import __VERSION__
 from {{ package_name }}.config.meta import __TITLE__
 
 pytestmark = pytest.mark.unittest
@@ -12,7 +12,3 @@ def test_version_non_empty():
 
 def test_title_matches_distribution():
     assert __TITLE__ == "{{ dist_name }}"
-
-
-def test_greet_default():
-    assert greet() == "Hello, world!"
