@@ -29,18 +29,27 @@ symlink intact.
 - Standalone executable builds are provided through `PyInstaller`.
 - The repository exposes a CLI entrypoint through `{{ package_name }}.entry`.
 {% endif %}
+{% if with_loc_badge %}
+- Repository badges include a gist-backed LOC badge updated by GitHub Actions.
+{% endif %}
 
 ## Common Commands
 
 ```bash
-make bootstrap   # install local development dependencies
-make unittest    # run pytest unit tests
-make docs        # build local documentation
-make package     # build sdist and wheel
-{% if with_pyinstaller %}make build       # build standalone executable with PyInstaller{% endif %}
+make bootstrap                            # install local development dependencies
+make unittest                             # run the full unit-test suite
+make unittest RANGE_DIR=./config          # run a focused test subtree
+pytest test/config/test_meta.py -v        # run a single test file directly
+make docs                                 # build the default local documentation
+make docs_en / make docs_zh               # build a specific docs language
+make package                              # build sdist and wheel
+{% if with_pyinstaller %}make build                                # build the standalone executable with PyInstaller{% endif %}
 ```
 
-## Working Rules
+Use the narrowest relevant command first. Do not jump straight to the full
+matrix if a focused regression can confirm the change.
+
+## Module Layout Rules
 
 - Keep cross-platform behavior in mind for Linux, macOS, and Windows.
 - Prefer keeping developer workflows available through `make` targets.
@@ -49,6 +58,90 @@ make package     # build sdist and wheel
 - Keep `requirements.txt`, `requirements-test.txt`, `requirements-doc.txt`, and
   `requirements-build.txt` semantically separated.
 - Keep test paths mirrored with source paths: `{{ package_name }}/foo/bar.py`
-  should map to `test/foo/test_bar.py`.
-- Only introduce `{{ package_name }}/entry` and `test/entry` when standalone
-  CLI build support is enabled.
+  must map to `test/foo/test_bar.py`.
+- Treat `test/` and `tools/` as Python package trees. Every directory that is
+  part of those trees must carry an `__init__.py`, not just the leaf directory.
+- Only introduce `{{ package_name }}/entry`, `{{ package_name }}/__main__.py`,
+  `test/entry`, and `tools/generate_spec.py` when standalone CLI build support
+  is enabled.
+
+## Code And Comment Style
+
+- Follow the existing `pyfcstm` house style: concise module docstrings,
+  explicit typing where it clarifies intent, and comments that explain
+  rationale or compatibility constraints instead of narrating syntax.
+- Prefer short, stable public surfaces. Keep package `__init__.py` files
+  minimal and let metadata live in `config/meta.py`.
+- Use complete sentences in docstrings and comments. Avoid filler comments such
+  as `# increment counter` or `# import module`.
+- When a compatibility choice is non-obvious, explain it directly above the
+  code that needs it.
+
+Good example:
+
+```python
+"""
+Project metadata for the package.
+
+This module defines immutable metadata constants consumed by packaging and
+documentation workflows.
+"""
+
+# Keep the workflow artifact name stable so local `make build` and CI produce
+# the same filename and downstream release steps do not need special cases.
+```
+
+Bad example:
+
+```python
+# Import click
+import click
+
+# Print version
+print(version)
+```
+
+## Commit Message Style
+
+Follow the dominant repository convention from recent history.
+
+- For normal commits, prefer `type(scope): imperative summary`, such as
+  `feat(cli): add standalone spec generation` or
+  `fix(workflow): align release dry-run with package build flow`.
+- Use short lowercase types such as `feat`, `fix`, `docs`, `test`, `refactor`,
+  and `chore`.
+- Keep the scope lowercase when present and omit it only when the change truly
+  spans the whole repository.
+- Write the summary as a concise imperative phrase starting with a lowercase
+  verb, and do not end it with a period.
+- For non-trivial changes, add a blank line and then a body with short `-`
+  bullets for behavior changes, compatibility notes, and validation.
+- Preserve standard trailers when applicable, especially
+  `Co-Authored-By: Name <email>`.
+
+## Workflow Rules
+
+- For CLI build and release jobs, pin Python to the repository `python_min`.
+- For GitHub-hosted runner labels, prefer the oldest generally available
+  non-preview standard label in each OS family that GitHub still documents for
+  regular hosted runners. The current repository baseline is:
+  `ubuntu-22.04`, `windows-2022`, and `macos-14`.
+- Runner availability changes over time. If you touch those labels, re-check
+  the official GitHub-hosted runner documentation before changing the matrix.
+- Release workflows must support dry-run behavior: when the workflow is not
+  triggered by a GitHub `release` event, builds should still run, but uploads to
+  PyPI and GitHub Releases must stay disabled.
+
+## Mandatory Validation
+
+- After each localized code change, run the smallest relevant regression before
+  continuing to stack more edits.
+- For source-only metadata changes, prefer a focused command first, such as
+  `pytest test/config/test_meta.py -v` or `make unittest RANGE_DIR=./config`.
+- For documentation generator or docs-source changes, run `make docs` before
+  moving on. If you touched multilingual doc wiring, run both
+  `make docs_en` and `make docs_zh`.
+- For packaging changes, run `make package`.
+- {% if with_pyinstaller %}For CLI entrypoint, PyInstaller, or release-asset changes, run `make build` in addition to the relevant unit tests.{% else %}If standalone CLI build support is later enabled, CLI-related changes must also pass `make build` before they are considered done.{% endif %}
+- Before committing, make sure the affected area has already passed a local
+  regression. Do not commit unvalidated code and plan to "check it later."

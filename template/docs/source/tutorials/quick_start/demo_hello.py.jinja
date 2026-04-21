@@ -1,12 +1,11 @@
-from {{ package_name }} import __VERSION__, greet
+from {{ package_name }} import __version__
+from {{ package_name }}.config.meta import __TITLE__
 
 
 def main():
-    print("{{ project_name }}")
-    print(f"version={__VERSION__}")
-    print(greet("docs"))
+    print(__TITLE__)
+    print(f"version={__version__}")
 
 
 if __name__ == "__main__":
     main()
-

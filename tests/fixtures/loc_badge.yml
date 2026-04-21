@@ -1,0 +1,20 @@
+project_name: Demo Badge Utility
+repo_name: demo-badge-utility
+dist_name: demo-badge-utility
+package_name: demo_badge_utility
+project_summary: Demo badge utility generated from tpl-python-core.
+author_name: HansBug
+author_email: hansbug@buaa.edu.cn
+github_owner: HansBug
+license_name: Apache-2.0
+initial_version: 0.1.0
+python_min: "3.8"
+python_max: "3.14"
+project_keywords: python, badge, demo
+with_pyinstaller: false
+with_loc_badge: true
+badge_gist_owner: HansBug
+badge_gist_id: 7eb8c32d6549edaa09592ca2a5a47187
+project_identity: Demo Badge Utility is a generated smoke-test project.
+project_scope: Keep the repository small, testable, and badge-friendly.
+project_constraints: The smoke project must validate bootstrap, unittest, docs, package, and badge rendering flows.

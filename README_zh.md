@@ -12,11 +12,12 @@
 - `AGENTS.md`，以及指向它的 `CLAUDE.md` 软链接
 - Sphinx + Read the Docs 文档骨架
 - 自动 API RST 生成脚本
-- GitHub Actions 的测试、文档、发布工作流
+- GitHub Actions 的测试与发布工作流
 
 可选能力：
 
 - PyInstaller 构建脚手架，以及对应的 CLI 入口布局
+- 基于 gist 的 LOC badge 自动更新
 
 ## 生成新仓库
 
@@ -45,19 +46,21 @@ copier copy --trust gh:HansBug/tpl-python-core /path/to/new-project
 生成仓库自带：
 
 - `test.yml`：跨平台单元测试
-- `docs.yml`：文档构建校验
-- `release.yml`：PyPI 与 release 产物发布
+- `release.yml`：dry-run 打包校验与正式发布
+- `badge.yml`：启用时用于刷新 LOC badge
 
 通常只需要按需配置可选 secrets：
 
 - `CODECOV_TOKEN`：覆盖率上传
 - `PYPI_PASSWORD`：发布到 PyPI
+- `BADGE_GIST_TOKEN`：刷新可选 LOC badge
 
 ## 模板本地开发
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python scripts/smoke_copy.py --fixture tests/fixtures/minimal.yml
+python scripts/smoke_copy.py --fixture tests/fixtures/loc_badge.yml
 python scripts/smoke_copy.py --fixture tests/fixtures/cli_pyinstaller.yml
 ```
 

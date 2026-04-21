@@ -11,6 +11,10 @@ _tasks:
     if [ "{{ 1 if not with_pyinstaller else 0 }}" = "1" ]; then
       find "docs/source/_shims" -mindepth 1 ! -name '.keep' -delete;
     fi
+  - >-
+    if [ "{{ 1 if not with_loc_badge else 0 }}" = "1" ]; then
+      rm -f ".github/workflows/badge.yml";
+    fi
   - rm -f "CLAUDE.md" && ln -s "AGENTS.md" "CLAUDE.md"
 
 project_name:
@@ -116,6 +120,22 @@ cli_command:
   help: Console command name.
   default: "{{ repo_name }}"
   when: "{{ with_pyinstaller }}"
+
+with_loc_badge:
+  type: bool
+  help: Enable gist-backed LOC badge automation and README badge rendering.
+  default: false
+
+badge_gist_owner:
+  type: str
+  help: GitHub owner of the public gist used for dynamic badge JSON.
+  default: "{{ github_owner }}"
+  when: "{{ with_loc_badge }}"
+
+badge_gist_id:
+  type: str
+  help: Public gist ID used to host the LOC badge JSON payload.
+  when: "{{ with_loc_badge }}"
 
 project_identity:
   type: str

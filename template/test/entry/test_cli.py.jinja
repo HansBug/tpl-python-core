@@ -2,6 +2,7 @@ import pytest
 from click.testing import CliRunner
 
 from {{ package_name }}.entry import main
+from {{ package_name }}.config.meta import __TITLE__, __VERSION__
 
 pytestmark = pytest.mark.unittest
 
@@ -10,11 +11,11 @@ def test_cli_help():
     runner = CliRunner()
     result = runner.invoke(main, ["--help"])
     assert result.exit_code == 0
-    assert "Name to greet" in result.output
+    assert "{{ project_summary }}" in result.output
 
 
 def test_cli_output():
     runner = CliRunner()
-    result = runner.invoke(main, ["--name", "Alice"])
+    result = runner.invoke(main, [])
     assert result.exit_code == 0
-    assert "Hello, Alice!" in result.output
+    assert result.output.strip() == f"{__TITLE__} {__VERSION__}"

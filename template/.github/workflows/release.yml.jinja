@@ -1,6 +1,8 @@
-name: Release
+name: Package Release
 
 on:
+  push:
+  workflow_dispatch:
   release:
     types: [published]
 
@@ -20,7 +22,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "{{ python_max }}"
+          python-version: "{{ python_min }}"
 
       - name: Install dependencies
         shell: bash
@@ -29,12 +31,22 @@ jobs:
           make bootstrap
           python -m pip install --upgrade build twine
 
+      - name: Show release mode
+        shell: bash
+        run: |
+          if [ "{% raw %}${{ github.event_name }}{% endraw %}" = "release" ]; then
+            echo "Release trigger detected: publish steps are enabled."
+          else
+            echo "Dry-run mode: build steps run, publish steps stay disabled."
+          fi
+
       - name: Build packages
         shell: bash
         run: |
           make package
 
       - name: Publish distribution to PyPI
+        if: {% raw %}${{ github.event_name == 'release' }}{% endraw %}
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           password: {% raw %}${{ secrets.PYPI_PASSWORD }}{% endraw %}
@@ -43,6 +55,7 @@ jobs:
           skip-existing: true
 
       - name: Upload distribution to GitHub release
+        if: {% raw %}${{ github.event_name == 'release' }}{% endraw %}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
@@ -65,7 +78,15 @@ jobs:
           - windows-2022
           - macos-14
         python-version:
-          - "{{ python_max }}"
+          - "{{ python_min }}"
+{% if python_min == "3.7" %}
+        exclude:
+          - os: macos-14
+            python-version: "3.7"
+        include:
+          - os: macos-14
+            python-version: "3.8"
+{% endif %}
 
     steps:
       - name: Checkout code
@@ -114,6 +135,7 @@ jobs:
           zip -r {{ repo_name }}-{% raw %}${{ runner.os }}{% endraw %}.zip release
 
       - name: Upload standalone CLI to GitHub release
+        if: {% raw %}${{ github.event_name == 'release' }}{% endraw %}
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}

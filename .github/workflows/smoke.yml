@@ -16,6 +16,7 @@ jobs:
           - macos-14
         fixture:
           - minimal
+          - loc_badge
           - cli_pyinstaller
 
     steps:

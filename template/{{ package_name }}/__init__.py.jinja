@@ -1,5 +1,9 @@
-from .config.meta import __VERSION__
-from .core import greet
+"""
+{{ project_name }} package namespace and version export.
 
-__all__ = ["__VERSION__", "greet"]
+This package provides the root namespace for the ``{{ package_name }}``
+distribution and exposes the installed package version via
+``{{ package_name }}.__version__``.
+"""
 
+from .config.meta import __VERSION__ as __version__

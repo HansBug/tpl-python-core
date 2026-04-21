@@ -1,0 +1,47 @@
+name: Badge Creation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-badges:
+    name: Update Badges
+    runs-on: ubuntu-22.04
+    if: {% raw %}${{ secrets.BADGE_GIST_TOKEN != '' }}{% endraw %}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Install cloc
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cloc
+
+      - name: Collect line counts
+        shell: bash
+        run: |
+          cloc {{ package_name }} test tools docs --json --quiet > cloc.json
+          echo "CODE_LINES=$(python - <<'PY'
+import json
+
+with open('cloc.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
+
+print(data['SUM']['code'])
+PY
+          )" >> "$GITHUB_ENV"
+
+      - name: Create LOC badge
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          auth: {% raw %}${{ secrets.BADGE_GIST_TOKEN }}{% endraw %}
+          gistID: "{{ badge_gist_id }}"
+          filename: loc.json
+          label: Lines of Code
+          message: {% raw %}${{ env.CODE_LINES }}{% endraw %}
+          color: lightgrey

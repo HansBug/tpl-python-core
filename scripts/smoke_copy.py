@@ -34,14 +34,24 @@ def _assert_rendered_layout(project_dir: Path, answers: dict):
     assert claude.is_symlink(), "CLAUDE.md should be a symlink."
     assert os.readlink(claude) == "AGENTS.md", "CLAUDE.md should point to AGENTS.md."
     assert (shims_dir / ".keep").is_file()
+    assert (project_dir / "tools" / "__init__.py").is_file()
+    assert (project_dir / "test" / "__init__.py").is_file()
+    assert (project_dir / "test" / "config" / "__init__.py").is_file()
+    assert (project_dir / ".github" / "workflows" / "test.yml").is_file()
+    assert (project_dir / ".github" / "workflows" / "release.yml").is_file()
+    assert not (project_dir / ".github" / "workflows" / "docs.yml").exists()
 
     assert (project_dir / "test" / "config" / "test_meta.py").is_file()
-    assert (project_dir / "test" / "test_core.py").is_file()
+    if answers.get("with_loc_badge"):
+        assert (project_dir / ".github" / "workflows" / "badge.yml").is_file()
+    else:
+        assert not (project_dir / ".github" / "workflows" / "badge.yml").exists()
 
     package_name = answers["package_name"]
     if answers.get("with_pyinstaller"):
         assert (project_dir / package_name / "__main__.py").is_file()
         assert (project_dir / package_name / "entry").is_dir()
+        assert (project_dir / "test" / "entry" / "__init__.py").is_file()
         assert (project_dir / "test" / "entry" / "test_cli.py").is_file()
         assert (project_dir / "requirements-build.txt").is_file()
         assert (project_dir / "tools" / "generate_spec.py").is_file()

@@ -1,13 +1,13 @@
 import pytest
 
-from {{ package_name }} import __VERSION__
+from {{ package_name }} import __version__
 from {{ package_name }}.config.meta import __TITLE__
 
 pytestmark = pytest.mark.unittest
 
 
 def test_version_non_empty():
-    assert __VERSION__
+    assert __version__
 
 
 def test_title_matches_distribution():

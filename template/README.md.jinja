@@ -2,6 +2,21 @@
 
 [中文说明 / Chinese README](./README_zh.md)
 
+<div align="center">
+
+[![PyPI](https://img.shields.io/pypi/v/{{ dist_name }})](https://pypi.org/project/{{ dist_name }}/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/{{ dist_name }})
+[![Code Test](https://github.com/{{ github_owner }}/{{ repo_name }}/workflows/Code%20Test/badge.svg)](https://github.com/{{ github_owner }}/{{ repo_name }}/actions?query=workflow%3A%22Code+Test%22)
+[![Package Release](https://github.com/{{ github_owner }}/{{ repo_name }}/workflows/Package%20Release/badge.svg)](https://github.com/{{ github_owner }}/{{ repo_name }}/actions?query=workflow%3A%22Package+Release%22)
+{% if with_loc_badge %}[![Badge Creation](https://github.com/{{ github_owner }}/{{ repo_name }}/workflows/Badge%20Creation/badge.svg)](https://github.com/{{ github_owner }}/{{ repo_name }}/actions?query=workflow%3A%22Badge+Creation%22)
+![Loc](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/{{ badge_gist_owner }}/{{ badge_gist_id }}/raw/loc.json){% endif %}
+[![codecov](https://codecov.io/gh/{{ github_owner | lower }}/{{ repo_name }}/graph/badge.svg)](https://codecov.io/gh/{{ github_owner | lower }}/{{ repo_name }})
+[![GitHub license](https://img.shields.io/github/license/{{ github_owner }}/{{ repo_name }})](https://github.com/{{ github_owner }}/{{ repo_name }}/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/{{ github_owner }}/{{ repo_name }})](https://github.com/{{ github_owner }}/{{ repo_name }}/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/{{ github_owner }}/{{ repo_name }})](https://github.com/{{ github_owner }}/{{ repo_name }}/network)
+
+</div>
+
 {{ project_summary }}
 
 ## Table of Contents
@@ -59,6 +74,11 @@ The generated repository keeps the familiar HansBug-style dependency split:
 - `requirements-test.txt` for unit test dependencies
 - `requirements-doc.txt` for documentation dependencies
 {% if with_pyinstaller %}- `requirements-build.txt` for build dependencies such as PyInstaller{% endif %}
+
+{% if with_loc_badge %}
+If LOC badge automation is enabled, configure the `BADGE_GIST_TOKEN` repository
+secret so the `Badge Creation` workflow can refresh the gist-backed badge JSON.
+{% endif %}
 
 ## Documentation
 

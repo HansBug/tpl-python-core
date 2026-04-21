@@ -1,10 +1,33 @@
-__TITLE__ = "{{ dist_name }}"
-__VERSION__ = "{{ initial_version }}"
-__DESCRIPTION__ = "{{ project_summary }}"
-__AUTHOR__ = "{{ author_name }}"
-__AUTHOR_EMAIL__ = "{{ author_email }}"
-__LICENSE__ = "{{ license_name }}"
-__KEYWORDS__ = "{{ project_keywords }}"
-__URL__ = "https://github.com/{{ github_owner }}/{{ repo_name }}"
-__DOC__ = "https://{{ repo_name }}.readthedocs.io/en/latest/"
+"""
+Project metadata for the :mod:`{{ package_name }}` package.
 
+This module defines immutable metadata constants consumed by packaging,
+documentation, and command-line workflows.
+"""
+
+#: Title of this project.
+__TITLE__: str = "{{ dist_name }}"
+
+#: Version of this project.
+__VERSION__: str = "{{ initial_version }}"
+
+#: Short description of the project, used by packaging metadata.
+__DESCRIPTION__: str = "{{ project_summary }}"
+
+#: Author of this project.
+__AUTHOR__: str = "{{ author_name }}"
+
+#: Contact email of the primary author.
+__AUTHOR_EMAIL__: str = "{{ author_email }}"
+
+#: SPDX-like license identifier for this project.
+__LICENSE__: str = "{{ license_name }}"
+
+#: Project keywords for packaging metadata.
+__KEYWORDS__: str = "{{ project_keywords }}"
+
+#: Repository homepage URL.
+__URL__: str = "https://github.com/{{ github_owner }}/{{ repo_name }}"
+
+#: Documentation homepage URL.
+__DOC__: str = "https://{{ repo_name }}.readthedocs.io/en/latest/"

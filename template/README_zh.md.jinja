@@ -2,6 +2,21 @@
 
 [English README](./README.md)
 
+<div align="center">
+
+[![PyPI](https://img.shields.io/pypi/v/{{ dist_name }})](https://pypi.org/project/{{ dist_name }}/)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/{{ dist_name }})
+[![Code Test](https://github.com/{{ github_owner }}/{{ repo_name }}/workflows/Code%20Test/badge.svg)](https://github.com/{{ github_owner }}/{{ repo_name }}/actions?query=workflow%3A%22Code+Test%22)
+[![Package Release](https://github.com/{{ github_owner }}/{{ repo_name }}/workflows/Package%20Release/badge.svg)](https://github.com/{{ github_owner }}/{{ repo_name }}/actions?query=workflow%3A%22Package+Release%22)
+{% if with_loc_badge %}[![Badge Creation](https://github.com/{{ github_owner }}/{{ repo_name }}/workflows/Badge%20Creation/badge.svg)](https://github.com/{{ github_owner }}/{{ repo_name }}/actions?query=workflow%3A%22Badge+Creation%22)
+![Loc](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/{{ badge_gist_owner }}/{{ badge_gist_id }}/raw/loc.json){% endif %}
+[![codecov](https://codecov.io/gh/{{ github_owner | lower }}/{{ repo_name }}/graph/badge.svg)](https://codecov.io/gh/{{ github_owner | lower }}/{{ repo_name }})
+[![GitHub license](https://img.shields.io/github/license/{{ github_owner }}/{{ repo_name }})](https://github.com/{{ github_owner }}/{{ repo_name }}/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/{{ github_owner }}/{{ repo_name }})](https://github.com/{{ github_owner }}/{{ repo_name }}/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/{{ github_owner }}/{{ repo_name }})](https://github.com/{{ github_owner }}/{{ repo_name }}/network)
+
+</div>
+
 {{ project_summary }}
 
 ## 目录
@@ -59,6 +74,12 @@ make bootstrap
 - `requirements-test.txt`：单元测试依赖
 - `requirements-doc.txt`：文档构建依赖
 {% if with_pyinstaller %}- `requirements-build.txt`：构建依赖，例如 PyInstaller{% endif %}
+
+{% if with_loc_badge %}
+如果启用了 LOC badge 自动更新，请在仓库 secrets 中配置
+`BADGE_GIST_TOKEN`，这样 `Badge Creation` workflow 才能刷新 gist 中的 badge
+JSON。
+{% endif %}
 
 ## 文档
 

@@ -12,11 +12,12 @@ The generated repositories always include:
 - `AGENTS.md` with `CLAUDE.md` as a symlink
 - Sphinx + Read the Docs documentation skeleton
 - auto-generated API RST helpers
-- GitHub Actions workflows for test, docs, and release
+- GitHub Actions workflows for test and release
 
 Optional features:
 
 - PyInstaller build scaffold, including the CLI entrypoint layout
+- gist-backed LOC badge automation
 
 ## Create A Repository
 
@@ -45,19 +46,21 @@ The generated repository is expected to support:
 Generated repositories include:
 
 - `test.yml` for cross-platform unit test runs
-- `docs.yml` for docs build validation
-- `release.yml` for PyPI and release asset publishing
+- `release.yml` for dry-run package validation and real release publishing
+- `badge.yml` for optional LOC badge refresh when enabled
 
 Only optional secrets should need to be configured:
 
 - `CODECOV_TOKEN` for coverage upload
 - `PYPI_PASSWORD` for release publishing
+- `BADGE_GIST_TOKEN` for optional LOC badge refresh
 
 ## Local Template Development
 
 ```bash
 python -m pip install -r requirements-dev.txt
 python scripts/smoke_copy.py --fixture tests/fixtures/minimal.yml
+python scripts/smoke_copy.py --fixture tests/fixtures/loc_badge.yml
 python scripts/smoke_copy.py --fixture tests/fixtures/cli_pyinstaller.yml
 ```
 
